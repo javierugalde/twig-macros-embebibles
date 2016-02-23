@@ -1,0 +1,65 @@
+{# Los "-" guiones que se ven entre las definicones de etiquetas {%- y -%} son para quitar espacios en blanco y minimizar el código generado #}
+{%- macro icon(icon, class, size) -%}
+    {% if icon %}<i class="fa fa-{{ icon }} {{ class }}{{ size ? 'fa-'~size : null }}"></i>{% endif %}
+{%- endmacro -%}
+
+{%- macro icon_edit(class, size) -%}
+    {%- from _self import icon -%}
+    {{ icon('edit', class, size) }}
+{%- endmacro -%}
+
+{%- macro icon_add(class, size) -%}
+    {%- from _self import icon -%}
+    {{ icon('plus', class, size) }}
+{%- endmacro -%}
+
+{%- macro icon_clear(class, size) -%}
+    {%- from _self import icon -%}
+    {#{{ icon('refresh', class, size) }}#}
+    {{ icon('trash', class, size) }}
+{%- endmacro -%}
+
+{%- macro icon_search(class, size) -%}
+    {%- from _self import icon -%}
+    {{ icon('search', class, size) }}
+{%- endmacro -%}
+
+{%- macro icon_filter(class, size) -%}
+    {%- from _self import icon -%}
+    {{ icon('filter', class, size) }}
+{%- endmacro -%}
+
+{%- macro icon_remove(class, size) -%}
+    {%- from _self import icon -%}
+    {{ icon('trash', class, size) }}
+{%- endmacro -%}
+
+{%- macro icon_show(class, size) -%}
+    {%- from _self import icon -%}
+    {{ icon('search', class, size) }}
+{%- endmacro -%}
+
+{%- macro icon_back(class, size) -%}
+    {%- from _self import icon -%}
+    {{ icon('reply', class, size) }}
+{%- endmacro -%}
+
+{%- macro icon_save(class, size) -%}
+    {%- from _self import icon -%}
+    {{ icon('save', class, size) }}
+{%- endmacro -%}
+
+{%- macro icon_check(class, size) -%}
+    {%- from _self import icon -%}
+    {{ icon('check', class, size) }}
+{%- endmacro -%}
+
+{%- macro icon_uncheck(class, size) -%}
+    {%- from _self import icon -%}
+    {{ icon('times', class, size) }}
+{%- endmacro -%}
+
+{%- macro boolean_icon(value, class, size) -%}
+    {%- from _self import icon_check, icon_uncheck -%}
+    {{ value ? icon_check(class, size) : icon_uncheck(class, size) }}
+{%- endmacro -%}
