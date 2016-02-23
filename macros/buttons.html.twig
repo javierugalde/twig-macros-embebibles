@@ -1,0 +1,267 @@
+{#
+  Macros de utilidad para mostrar links y botones con los estilos del bootstrap de twitter.
+
+  Ejemplo de uso:
+
+  {% from 'macro/buttons.html.twig' import save, link %} Se importan las macros a usar
+
+  {{ save() }} // Por defecto muestra un boton submit de tipo btn-primary, con un icono y el texto Guardar.
+  {{ save('Texto') }} // Reemplazamos el texto por defecto.
+  {{ save('Texto', {id: 'btn-id'}) }} // Reemplazamos el texto por defecto, pasamos un atributo html id.
+  {{ save(false, {id: 'btn-id'}) }} // Evitamos que se muestre el texto.
+  {{ save('Hola', {hide_text: true}) }} // Evitamos que se muestre el texto.
+  {{ save('Hola', {icon: icon_save()}) }} // Muestra el icono indicado.
+#}
+{# Los "-" guiones que se ven entre las definicones de etiquetas {%- y -%} son para quitar espacios en blanco y minimizar el código generado #}
+{%- macro attributes(attributes, text) -%}
+    {%- import _self as links -%}
+    {%- for name, value in attributes if name not in ['class', 'title', 'icon', 'type', 'size', 'default_class', 'hide_text', 'show_modal'] -%}
+        {{- ' ' -}}{{ name }}="{{ value|escape('html_attr') }}"
+    {%- endfor -%}
+    {{- ' ' -}}title="{{ attributes.title|default(text) }}"
+    {%- if attributes.show_modal is defined %}{{- ' ' -}}data-toggle="modal" data-target="{{ attributes.show_modal }}"{% endif -%}
+{%- endmacro -%}
+
+{%- macro attr_class(attributes) -%}
+    {%- import _self as links -%}
+    class="btn btn-{{ attributes.type|default('default') }} {{ attributes.default_class|default }} {{ attributes.class|default }} {{ links.btn_size(attributes.size|default) }}"
+{%- endmacro -%}
+
+{%- macro simple_attr_class(attributes) -%}
+    {%- import _self as links -%}
+    {%- if attributes.default_class is defined or attributes.class is defined -%}
+        class="{{ (attributes.default_class|default ~ ' ' ~ attributes.class|default)|trim }}"
+    {%- endif -%}
+{%- endmacro -%}
+
+{%- macro link(url, text, attributes = []) -%}
+    {%- import _self as links -%}
+    <a href="{{- url -}}" {{ links.attr_class(attributes) }} {{ links.attributes(attributes, text) }}>
+        {%- if attributes.icon is defined -%}{{ attributes.icon }} {% endif -%}
+        {% if attributes.hide_text|default(false) == false %}{{- text -}}{% endif %}
+    </a>
+{%- endmacro -%}
+
+{%- macro btn_size(size, default) -%}
+    {%- set size = size|default(default) -%}
+    {{- size and size != 'md' ? 'btn-'~size -}}
+{%- endmacro -%}
+
+{%- macro simple_link(url, text, attributes = []) -%}
+    {%- import _self as links -%}
+    <a href="{{- url -}}" {{ links.simple_attr_class(attributes) }} {{ links.attributes(attributes, text) }}>
+        {%- if attributes.icon is defined -%}{{ attributes.icon }} {% endif -%}
+        {% if attributes.hide_text|default(false) == false %}{{- text -}}{% endif %}
+    </a>
+{%- endmacro -%}
+
+{# Macros para botones de formulario #}
+{%- macro button(text, attributes = []) -%}
+    {%- import _self as links -%}
+    <button type="button" {{ links.attr_class(attributes) }} {{ links.attributes(attributes, text) }}>
+        {%- if attributes.icon is defined -%}{{ attributes.icon }} {% endif -%}
+        {% if attributes.hide_text|default(false) == false %}{{- text -}}{% endif %}
+    </button>
+{%- endmacro -%}
+
+{%- macro submit(text, attributes = []) -%}
+    {%- import _self as links -%}
+    <button type="submit" {{ links.attr_class(attributes) }} {{ links.attributes(attributes, text) }}>
+        {%- if attributes.icon is defined -%}{{ attributes.icon }} {% endif -%}
+        {% if attributes.hide_text|default(false) == false %}{{- text -}}{% endif %}
+    </button>
+{%- endmacro -%}
+
+{# Macros para links con estilos de boton #}
+{%- macro btn_yes(text, attributes = []) -%}
+    {%- import _self as links -%}
+    {%- from 'macro/icons.html.twig' import icon -%}
+    {{- links.submit(text|default('label.yes'|trans), {
+        type: 'primary', icon: icon('thumbs-o-up'), class: 'btn-yes',
+    }|merge(attributes)) -}}
+{%- endmacro -%}
+
+{%- macro btn_no(text, type, icon, size, attributes) -%}
+    {%- import _self as links -%}
+    {%- from 'macro/icons.html.twig' import icon -%}
+    {{- links.submit(text is sameas(false) ? '' : text|default('label.no'|trans), {
+        type: 'primary', icon: icon('thumbs-o-down'), class: 'btn-no',
+    }|merge(attributes)) -}}
+{%- endmacro -%}
+
+{%- macro primary_link(url, text, attributes = []) -%}
+    {%- import _self as links -%}
+    {{- links.link(url, text, {type: 'primary'}|merge(attributes)) -}}
+{%- endmacro -%}
+
+{%- macro success_link(url, text, attributes = []) -%}
+    {%- import _self as links -%}
+    {{- links.link(url, text, {type: 'success'}|merge(attributes)) -}}
+{%- endmacro -%}
+
+{%- macro info_link(url, text, attributes = []) -%}
+    {%- import _self as links -%}
+    {{- links.link(url, text, {type: 'info'}|merge(attributes)) -}}
+{%- endmacro -%}
+
+{%- macro warning_link(url, text, attributes = []) -%}
+    {%- import _self as links -%}
+    {{- links.link(url, text, {type: 'warning'}|merge(attributes)) -}}
+{%- endmacro -%}
+
+{%- macro danger_link(url, text, attributes = []) -%}
+    {%- import _self as links -%}
+    {{- links.link(url, text, {type: 'danger'}|merge(attributes)) -}}
+    {{- links.btn(url, text, 'danger', null, icon, class, htmlAttributes) -}}
+{%- endmacro -%}
+
+{%- macro btn_link(url, text, attributes = []) -%}
+    {%- import _self as links -%}
+    {{- links.link(url, text, {type: 'link'}|merge(attributes)) -}}
+{%- endmacro -%}
+
+{# Macros para botones de operaciones CRUD #}
+{%- macro back(url, text, attributes = []) -%}
+    {%- import _self as links -%}
+    {%- from 'macro/icons.html.twig' import icon_back -%}
+    {{- links.link(url, text is sameas(false) ? '' : text|default('label.back'|trans), {
+        default_class: 'btn-back', icon: icon_back(),
+        title: text|default('label.back'|trans),
+    }|merge(attributes)) -}}
+{%- endmacro -%}
+
+{%- macro back_to_list(url, text, attributes = []) -%}
+    {%- import _self as links -%}
+    {{- links.back(url, text is sameas(false) ? false : text|default('label.back_to_the_list'|trans), attributes) -}}
+{%- endmacro -%}
+
+{%- macro show(url, text, attributes = []) -%}
+    {%- import _self as links -%}
+    {%- from 'macro/icons.html.twig' import icon_show -%}
+    {{- links.link(url, text is sameas(false) ? '' : text|default('label.show'|trans), {
+        default_class: 'btn-show', icon: icon_show(),
+        title: text|default('label.show'|trans),
+    }|merge(attributes)) -}}
+{%- endmacro -%}
+
+{%- macro simple_show(url, text, attributes = []) -%}
+    {%- import _self as links -%}
+    {%- from 'macro/icons.html.twig' import icon_show -%}
+    {{- links.simple_link(url, text is sameas(false) ? '' : text|default('label.show'|trans), {
+        default_class: 'btn-show', icon: icon_show(),
+        title: text|default('label.show'|trans),
+    }|merge(attributes)) -}}
+{%- endmacro -%}
+
+{%- macro edit(url, text, attributes = []) -%}
+    {%- import _self as links -%}
+    {%- from 'macro/icons.html.twig' import icon_edit -%}
+    {{- links.link(url, text is sameas(false) ? '' : text|default('label.edit'|trans), {
+        default_class: 'btn-edit', icon: icon_edit(),
+        title: text|default('label.edit'|trans),
+    }|merge(attributes)) -}}
+{%- endmacro -%}
+
+{%- macro simple_edit(url, text, attributes = []) -%}
+    {%- import _self as links -%}
+    {%- from 'macro/icons.html.twig' import icon_edit -%}
+    {{- links.simple_link(url, text is sameas(false) ? '' : text|default('label.edit'|trans), {
+        default_class: 'btn-edit', icon: icon_edit(),
+        title: text|default('label.edit'|trans),
+    }|merge(attributes)) -}}
+{%- endmacro -%}
+
+{%- macro delete(url, text, attributes = []) -%}
+    {%- import _self as links -%}
+    {%- from 'macro/icons.html.twig' import icon_remove -%}
+    {{- links.link(url, text is sameas(false) ? '' : text|default('label.delete'|trans), {
+        default_class: 'btn-delete', icon: icon_remove(),
+        title: text|default('label.delete'|trans),
+    }|merge(attributes)) -}}
+{%- endmacro -%}
+
+{%- macro simple_delete(url, text, attributes = []) -%}
+    {%- import _self as links -%}
+    {%- from 'macro/icons.html.twig' import icon_remove -%}
+    {{- links.simple_link(url, text is sameas(false) ? '' : text|default('label.delete'|trans), {
+        default_class: 'btn-delete', icon: icon_remove(),
+        title: text|default('label.delete'|trans),
+    }|merge(attributes)) -}}
+{%- endmacro -%}
+
+{%- macro add(url, text, attributes = []) -%}
+    {%- import _self as links -%}
+    {%- from 'macro/icons.html.twig' import icon_add -%}
+    {{- links.primary_link(url, text is sameas(false) ? '' : text|default('label.add'|trans), {
+        default_class: 'btn-add', icon: icon_add(),
+        title: text|default('label.add'|trans),
+    }|merge(attributes)) -}}
+{%- endmacro -%}
+
+{%- macro save(text, attributes = []) -%}
+    {%- import _self as btn -%}
+    {%- from 'macro/icons.html.twig' import icon_save -%}
+    {{- btn.submit(text is sameas(false) ? '' : text|default('label.save'|trans), {
+        default_class: 'btn-save', icon: icon_save(), type: 'primary',
+        title: text|default('label.save'|trans),
+    }|merge(attributes)) -}}
+{%- endmacro -%}
+
+{%- macro search(text, attributes = []) -%}
+    {%- import _self as btn -%}
+    {%- from 'macro/icons.html.twig' import icon_search -%}
+    {{- btn.submit(text is sameas(false) ? '' : text|default('label.search'|trans), {
+        default_class: 'btn-search', icon: icon_search(),
+        title: text|default('label.search'|trans),
+    }|merge(attributes)) -}}
+{%- endmacro -%}
+
+{%- macro filter(text, attributes = []) -%}
+    {%- import _self as btn -%}
+    {%- from 'macro/icons.html.twig' import icon_filter -%}
+    {{- btn.submit(text is sameas(false) ? '' : text|default('label.filter'|trans), {
+        default_class: 'btn-search', icon: icon_filter(),
+        title: text|default('label.filter'|trans),
+    }|merge(attributes)) -}}
+{%- endmacro -%}
+
+{%- macro clear_filters(url, text, attributes = []) -%}
+    {%- import _self as links -%}
+    {%- from 'macro/icons.html.twig' import icon_clear -%}
+    {{- links.link(url, text is sameas(false) ? '' : text|default('label.clear'|trans), {
+        default_class: 'btn-clear-filters', icon: icon_clear(),
+        title: text|default('label.clear'|trans),
+    }|merge(attributes)) -}}
+{%- endmacro -%}
+
+{%- macro link_yes(url, text, attributes = []) -%}
+    {%- import _self as links -%}
+    {{- links.primary_link(url, text is sameas(false) ? '' : text|default('label.yes'|trans), {
+        default_class: 'link-yes',
+        title: text|default('label.yes'|trans),
+    }|merge(attributes)) -}}
+{%- endmacro -%}
+
+{%- macro link_no(url, text, attributes = []) -%}
+    {%- import _self as links -%}
+    {{- links.link(url, text is sameas(false) ? '' : text|default('label.no'|trans), {
+        default_class: 'link-no',
+        title: text|default('label.no'|trans),
+    }|merge(attributes)) -}}
+{%- endmacro -%}
+
+{%- macro link_export(url, text, attributes = []) -%}
+    {%- import _self as links -%}
+    {{- links.primary_link(url, text is sameas(false) ? '' : text|default('label.export'|trans), {
+        default_class: 'link-export',
+        title: text|default('label.export'|trans),
+    }|merge(attributes)) -}}
+{%- endmacro -%}
+
+{%- macro link_print(url, text, attributes = []) -%}
+    {%- import _self as links -%}
+    {{- links.link(url, text is sameas(false) ? '' : text|default('label.print'|trans), {
+        default_class: 'link-print',
+        title: text|default('label.print'|trans),
+    }|merge(attributes)) -}}
+{%- endmacro -%}
